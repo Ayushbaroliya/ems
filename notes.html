@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes & Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Notes & Tracker</h1>
+    <nav>
+      <button id="show-notes">Notes</button>
+      <button id="show-tracker">Tracker</button>
+      <button id="show-analytics">Analytics</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="notes-section">
+      <h2>Notes</h2>
+      <form id="note-form">
+        <input id="note-title" placeholder="Title" required />
+        <input id="note-author" placeholder="Author (name)" />
+        <textarea id="note-body" placeholder="Write a note..." required></textarea>
+        <button type="submit">Save Note</button>
+      </form>
+
+      <ul id="notes-list"></ul>
+    </section>
+
+    <section id="tracker-section" class="hidden">
+      <h2>Tracker</h2>
+      <form id="task-form">
+        <input id="task-title" placeholder="Task / Video name" required />
+        <input id="task-assignee" placeholder="Assignee name" required />
+        <input id="task-due" type="date" />
+        <select id="task-status">
+          <option value="todo">To do</option>
+          <option value="done">Done</option>
+        </select>
+        <button type="submit">Add Task</button>
+      </form>
+
+      <ul id="tasks-list"></ul>
+    </section>
+
+    <section id="analytics-section" class="hidden">
+      <h2>Analytics</h2>
+      <div id="analytics-output"></div>
+    </section>
+  </main>
+
+  <script type="module" src="notes.js"></script>
+</body>
+</html>

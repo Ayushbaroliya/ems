@@ -1,0 +1,55 @@
+{
+  "name": "CollabSponsor EMS",
+  "short_name": "CollabSponsor",
+  "description": "Employee Management System and Tracker for CollabSponsor",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tasks",
+      "url": "./index.html#tasks",
+      "description": "View and manage team tasks"
+    },
+    {
+      "name": "Notes",
+      "url": "./index.html#notes",
+      "description": "Create and read shared team notes"
+    },
+    {
+      "name": "Clients",
+      "url": "./index.html#clients",
+      "description": "Manage clients and video schedules"
+    }
+  ]
+}

@@ -3,7 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMS Live</title>
+<title>CollabSponsor EMS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#07090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registered:', reg.scope))
+        .catch(err => console.error('Service Worker registration failed:', err));
+    });
+  }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredPrompt = e;
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) {
+      btn.style.display = 'inline-flex';
+      btn.style.alignItems = 'center';
+    }
+  });
+  window.addEventListener('appinstalled', (evt) => {
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.style.display = 'none';
+    console.log('CollabSponsor EMS installed.');
+  });
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -313,7 +343,7 @@ select option{background:#1a2030}
 <body>
 
 <header>
-  <div class="logo"><span class="logo-dot"></span>EMS Live</div>
+  <div class="logo"><img src="icon-192.png" alt="CollabSponsor" style="width:26px;height:26px;border-radius:6px;object-fit:cover;box-shadow:0 0 10px rgba(59,130,246,0.3);"><div class="logo-dot"></div>CollabSponsor EMS</div>
   <div class="header-right">
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('tasks',this)">Tasks</button>
@@ -322,6 +352,9 @@ select option{background:#1a2030}
       <button class="nav-tab" onclick="showPage('clients',this)">Clients</button>
       <button class="nav-tab" onclick="showPage('dashboard',this)">Dashboard</button>
     </div>
+    <button id="pwa-install-btn" style="display: none; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid rgba(34,197,94,0.3); background: rgba(34,197,94,0.15); color: #86efac; transition: all .15s; font-family: 'DM Sans', sans-serif;">
+      📥 Install App
+    </button>
     <div class="header-time" id="live-time"></div>
   </div>
 </header>
@@ -1121,7 +1154,7 @@ setTimeout(()=>window.renderAllClientsData(), 100);
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import{getFirestore,collection,addDoc,onSnapshot,deleteDoc,doc,updateDoc,query,orderBy,serverTimestamp,getDocs,where}from"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import{getFirestore,collection,addDoc,onSnapshot,deleteDoc,doc,updateDoc,query,orderBy,serverTimestamp,getDocs,where,enableIndexedDbPersistence}from"https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const cfg={
   apiKey:"AIzaSyAxs6w1l2QJsCcQWElKu0WwZzrbbKwdEM0",
@@ -1133,6 +1166,15 @@ const cfg={
 };
 const app=initializeApp(cfg);
 const db=getFirestore(app);
+
+// Enable offline persistence for database queries
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    console.warn('Firestore persistence failed: multiple tabs open');
+  } else if (err.code === 'unimplemented') {
+    console.warn('Firestore persistence unimplemented in browser');
+  }
+});
 
 let tasks=[];
 let notes=[];
@@ -1806,6 +1848,75 @@ function buildDashNotes(yr,mo){
 // Initialize calendar member tabs
 buildCalMemberTabs();
 renderCalendar();
+
+// PWA Install Button Handler
+const installBtn = document.getElementById('pwa-install-btn');
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    const promptEvent = window.deferredPrompt;
+    if (!promptEvent) return;
+    promptEvent.prompt();
+    const { outcome } = await promptEvent.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    window.deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+}
+
+// Online/Offline Status Indicator
+function updateOnlineStatus() {
+  const dot = document.querySelector('.logo-dot');
+  const liveTime = document.getElementById('live-time');
+  if (navigator.onLine) {
+    if (dot) {
+      dot.style.background = 'var(--green)';
+      dot.style.boxShadow = '0 0 8px var(--green)';
+    }
+    const offlineBadge = document.getElementById('offline-badge');
+    if (offlineBadge) offlineBadge.remove();
+  } else {
+    if (dot) {
+      dot.style.background = 'var(--red)';
+      dot.style.boxShadow = '0 0 8px var(--red)';
+    }
+    if (!document.getElementById('offline-badge')) {
+      const badge = document.createElement('span');
+      badge.id = 'offline-badge';
+      badge.style.cssText = 'background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px;';
+      badge.textContent = 'Offline Mode';
+      if (liveTime) {
+        liveTime.parentNode.insertBefore(badge, liveTime);
+      }
+      if (typeof showToast === 'function') {
+        showToast('You are offline. Working in offline mode.', 'error');
+      }
+    }
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+setTimeout(updateOnlineStatus, 1000);
+
+// Hash routing support
+function handleHashRoute() {
+  const hash = window.location.hash.substring(1).toLowerCase();
+  const validPages = ['tasks', 'notes', 'attendance', 'clients', 'dashboard'];
+  if (hash && validPages.includes(hash)) {
+    const btn = Array.from(document.querySelectorAll('.nav-tab')).find(b => {
+      const text = b.textContent.trim().toLowerCase();
+      return text === hash;
+    });
+    if (btn && typeof showPage === 'function') {
+      showPage(hash, btn);
+    }
+  }
+}
+window.addEventListener('hashchange', handleHashRoute);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', handleHashRoute);
+} else {
+  handleHashRoute();
+}
 </script>
 </body>
 </html>

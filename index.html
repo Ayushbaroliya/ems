@@ -272,15 +272,6 @@ select option{background:#1a2030}
 .video-warning{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#fca5a5;margin-top:8px;display:none}
 .video-warning.show{display:block}
 
-@media(max-width:1024px){.main-grid,.att-main{grid-template-columns:1fr}.dash-grid,.dash-grid3{grid-template-columns:1fr}.dash-top,.att-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.emp-summary-grid{grid-template-columns:1fr}.notes-grid{grid-template-columns:1fr}}
-@media(max-width:600px){
-  .wrapper{padding:16px}.stats-row,.dash-top,.att-grid{grid-template-columns:1fr 1fr}
-  header{padding:0 12px;height:auto;flex-wrap:wrap;gap:8px;padding-top:10px;padding-bottom:10px}
-  .header-time{display:none}.nav-tabs{gap:2px;width:100%}.nav-tab{padding:6px 8px;font-size:11px;flex:1;text-align:center}
-  .logo{font-size:15px}
-}
-
 /* ── CLIENT CARDS GRID ── */
 .clients-layout{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
 .client-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
@@ -336,7 +327,128 @@ select option{background:#1a2030}
 .legend-dot{width:8px;height:8px;border-radius:2px}
 .btn-amber{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.25)}
 
+/* ── MOBILE APP LAYOUT & NAVIGATION ── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(14, 17, 23, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border2);
+  z-index: 150;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 8px 12px 8px;
+  box-sizing: border-box;
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, transform 0.1s;
+  flex: 1;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.mobile-nav-item svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s;
+}
+.mobile-nav-item.active {
+  color: var(--accent);
+}
+.mobile-nav-item.active svg {
+  transform: scale(1.1);
+  stroke: var(--accent);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
 @media(max-width:1100px){.clients-layout{grid-template-columns:1fr}}
+
+@media(max-width:1024px){
+  .main-grid,.att-main{grid-template-columns:1fr}
+  .dash-grid,.dash-grid3{grid-template-columns:1fr}
+  .dash-top,.att-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+@media(max-width:768px){
+  .emp-summary-grid{grid-template-columns:1fr}
+  .notes-grid{grid-template-columns:1fr}
+  header .nav-tabs { display: none; }
+  .mobile-nav { display: flex; }
+  .wrapper { padding: 12px 12px 80px 12px !important; }
+  
+  /* Touch target sizes & inputs */
+  input, select, textarea {
+    padding: 11px 14px;
+    font-size: 16px; /* Avoid iOS auto-zoom */
+  }
+  .select-wrap::after {
+    right: 14px;
+  }
+  .btn {
+    padding: 13px 20px;
+    font-size: 14px;
+  }
+  
+  /* Modals as slide-up bottom sheets */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal-box {
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    margin-bottom: 0;
+    max-height: 85vh;
+    animation: slideUp 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94) forwards;
+  }
+  
+  /* Compact card style for statistics */
+  .stats-row, .dash-top, .att-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .stat, .dstat, .att-stat {
+    padding: 12px 14px;
+  }
+  .stat-value, .dstat-val, .att-stat-val {
+    font-size: 20px;
+  }
+}
+
+@media(max-width:600px){
+  header { padding: 0 16px; height: 56px; }
+  .logo { font-size: 15px; }
+  .header-time { display: none; }
+  .stats-row, .dash-top, .att-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
 
 </style>
 </head>
@@ -731,6 +843,30 @@ select option{background:#1a2030}
   </div>
 </div>
 
+<!-- ── MOBILE NAVIGATION BOTTOM BAR ── -->
+<div class="mobile-nav">
+  <button class="mobile-nav-item active" onclick="showPage('tasks', this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 11l3 3 5-5"></path></svg>
+    <span>Tasks</span>
+  </button>
+  <button class="mobile-nav-item" onclick="showPage('notes', this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    <span>Notes</span>
+  </button>
+  <button class="mobile-nav-item" onclick="showPage('attendance', this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    <span>Attendance</span>
+  </button>
+  <button class="mobile-nav-item" onclick="showPage('clients', this)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    <span>Clients</span>
+  </button>
+  <button class="mobile-nav-item" onclick="showPage('dashboard', this)">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+    <span>Dashboard</span>
+  </button>
+</div>
+
 <!-- ═══════════════════════════════════════════════ SCRIPTS ═══ -->
 <script>
 function tick(){
@@ -743,12 +879,27 @@ tick();setInterval(tick,1000);
 
 window.showPage=function(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  const targetPage = document.getElementById('page-'+id);
+  if (targetPage) targetPage.classList.add('active');
+  
+  // Deactivate all nav tabs and mobile nav items
+  document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(t=>t.classList.remove('active'));
+  
+  // Activate corresponding tab in desktop navbar and bottom mobile navigation
+  const matchingTabs = document.querySelectorAll(`.nav-tab[onclick*="'${id}'"], .mobile-nav-item[onclick*="'${id}'"]`);
+  matchingTabs.forEach(t=>t.classList.add('active'));
+  
+  // Fallback
+  if (el) el.classList.add('active');
+
   if(id==='dashboard'&&window._renderDashboard)window._renderDashboard();
   if(id==='clients'&&window.renderAllClientsData)window.renderAllClientsData();
   if(id==='attendance'&&window.renderAttendanceLog){window.renderAttendanceLog();renderCalendar();}
+  
+  // Sync URL hash
+  if (window.location.hash !== '#' + id) {
+    history.replaceState(null, null, '#' + id);
+  }
 };
 
 (function(){
